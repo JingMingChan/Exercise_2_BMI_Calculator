@@ -5,18 +5,14 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import android.view.inputmethod.InputMethodManager
-import android.widget.Button
-import android.widget.EditText
-import android.widget.ImageView
-import android.widget.TextView
+import android.widget.*
 import java.text.DecimalFormat
 
 class MainActivity : AppCompatActivity() {
 
     lateinit var weight:EditText
     lateinit var height:EditText
-    lateinit var bmiVal:TextView
-    lateinit var bmiSta:TextView
+    lateinit var bmi:TextView
     lateinit var bmiImg:ImageView
 
     val formater = DecimalFormat("0.0")
@@ -27,8 +23,7 @@ class MainActivity : AppCompatActivity() {
 
         weight = findViewById(R.id.editTextWeight)
         height = findViewById(R.id.editTextHeight)
-        bmiSta = findViewById(R.id.textViewBMIStatus)
-        bmiVal = findViewById(R.id.textViewBMIVal)
+        bmi = findViewById(R.id.textViewBMI)
         bmiImg = findViewById(R.id.imageViewBMI)
 
         findViewById<Button>(R.id.btnCal).setOnClickListener {
@@ -42,15 +37,20 @@ class MainActivity : AppCompatActivity() {
 
     fun BMICal(view:View){
 
-        try{
+        bmi.setText(R.string.bmi_text)
 
-        bmiVal.setText(formater.format(weight.text.toString().toDouble()/(height.text.toString().toDouble()/100 * height.text.toString().toDouble()/100)))
+          try{
+              val totalBMI : Double = weight.text.toString().toDouble()/(height.text.toString().toDouble()/100 * height.text.toString().toDouble()/100)
 
-        bmiSta.setText(BMIStatus(weight.text.toString().toDouble()/(height.text.toString().toDouble()/100 * height.text.toString().toDouble()/100)))
+              bmi.append(formater.format(totalBMI))
+              bmi.append("  ")
+              bmi.append(getResources().getString(BMIStatus(totalBMI)))
+              bmiImg.setImageResource(BMIImage(totalBMI))
 
-        bmiImg.setImageResource(BMIImage(weight.text.toString().toDouble()/(height.text.toString().toDouble()/100 * height.text.toString().toDouble()/100)))
         }catch (e:Exception){
             clear()
+            Toast.makeText(this, "Please don't leave Weight and Height empty",
+                Toast.LENGTH_SHORT).show()
         }
 
         val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
@@ -62,8 +62,7 @@ class MainActivity : AppCompatActivity() {
 
         height.setText("")
         weight.setText("")
-        bmiSta.setText("")
-        bmiVal.setText("")
+        bmi.setText(R.string.bmi_text)
         bmiImg.setImageResource(R.drawable.empty)
     }
 
@@ -84,7 +83,7 @@ class MainActivity : AppCompatActivity() {
             double < 18.5 -> R.string.under
             (double >= 18.5 && double <= 24.9) -> R.string.nor
             double >= 25.0 -> R.string.over
-            else -> R.string.undefined
+            else -> R.string.input_error
         }
         return bmiSta
     }
